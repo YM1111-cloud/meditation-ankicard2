@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>瞑想ガイド② フラッシュカード</title>
+ <style>
+ body {
+ font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+ background-color: #f7f9fc;
+ color: #333333;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ padding: 20px;
+ margin: 0;
+ }
+
+ h1 {
+ font-size: 1.5rem;
+ color: #2c3e50;
+ margin-bottom: 10px;
+ }
+
+ .header-stats {
+ display: flex;
+ justify-content: space-between;
+ width: 100%;
+ max-width: 600px;
+ margin-bottom: 15px;
+ font-size: 1.1rem;
+ font-weight: bold;
+ color: #555;
+ padding: 0 10px;
+ }
+
+ .top-controls {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 8px;
+ width: 100%;
+ max-width: 600px;
+ margin-bottom: 20px;
+ }
+
+ .top-btn {
+ flex: 1;
+ min-width: 130px;
+ padding: 10px 12px;
+ font-size: 0.95rem;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ color: white;
+ transition: background-color 0.2s, transform 0.1s;
+ box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+ }
+
+ .top-btn:active { transform: scale(0.98); }
+ 
+ .btn-all { background-color: #7f8c8d; }
+ .btn-all:hover { background-color: #6c7a7d; }
+ .btn-unanswered { background-color: #3498db; }
+ .btn-unanswered:hover { background-color: #2980b9; }
+ .btn-review { background-color: #e67e22; }
+ .btn-review:hover { background-color: #d35400; }
+ .btn-incorrect { background-color: #9b59b6; }
+ .btn-incorrect:hover { background-color: #8e44ad; }
+
+ .mode-indicator {
+ font-size: 0.9rem;
+ color: #e67e22;
+ font-weight: bold;
+ margin-bottom: 10px;
+ }
+
+ #flashcard {
+ background-color: #ffffff;
+ width: 100%;
+ max-width: 600px;
+ min-height: 400px;
+ border-radius: 16px;
+ box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ padding: 30px;
+ box-sizing: border-box;
+ text-align: center;
+ position: relative;
+ }
+
+ #front-side, #back-side {
+ width: 100%;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ }
+ 
+ #back-side {
+ display: none;
+ text-align: left;
+ align-items: flex-start;
+ }
+
+ .date-badge {
+ font-size: 0.85rem;
+ background-color: #edf2f7;
+ color: #4a5568;
+ padding: 6px 14px;
+ border-radius: 20px;
+ margin-bottom: 5px;
+ font-weight: bold;
+ display: inline-block;
+ }
+
+ .srs-badge {
+ font-size: 0.8rem;
+ color: #e67e22;
+ margin-bottom: 20px;
+ font-weight: bold;
+ }
+
+ .english-text {
+ font-size: 1.4rem;
+ font-weight: bold;
+ color: #1a1a1a;
+ margin-bottom: 25px;
+ line-height: 1.4;
+ text-align: center;
+ }
+
+ .english-text-back {
+ font-size: 1.2rem;
+ font-weight: bold;
+ color: #34495e;
+ margin-bottom: 15px;
+ line-height: 1.4;
+ text-align: left;
+ width: 100%;
+ border-bottom: 2px dashed #e1e8ed;
+ padding-bottom: 15px;
+ }
+
+ .japanese-text {
+ font-size: 1.2rem;
+ font-weight: bold;
+ color: #2c3e50;
+ margin-bottom: 20px;
+ line-height: 1.6;
+ width: 100%;
+ border-bottom: 2px solid #e1e8ed;
+ padding-bottom: 15px;
+ }
+
+ .note-box {
+ background-color: #fff9e6;
+ border-left: 4px solid #f5a623;
+ padding: 15px;
+ border-radius: 4px;
+ font-size: 1rem;
+ line-height: 1.6;
+ color: #5c4716;
+ width: 100%;
+ box-sizing: border-box;
+ }
+
+ #play-audio-btn {
+ font-size: 1.1rem;
+ padding: 12px 24px;
+ border-radius: 30px;
+ background-color: #4a90e2;
+ color: white;
+ border: none;
+ cursor: pointer;
+ box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+ transition: transform 0.1s, background-color 0.2s;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+ font-weight: bold;
+ }
+
+ #play-audio-btn:active {
+ transform: scale(0.95);
+ background-color: #357abd;
+ }
+
+ .controls {
+ display: flex;
+ gap: 10px;
+ margin-top: 30px;
+ width: 100%;
+ max-width: 600px;
+ justify-content: center;
+ }
+
+ .action-btn {
+ flex: 1;
+ padding: 15px 10px;
+ font-size: 1rem;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ transition: background-color 0.2s, opacity 0.2s;
+ }
+
+ #prev-btn { background-color: #e2e8f0; color: #4a5568; }
+ #flip-btn { background-color: #4a90e2; color: white; }
+ #next-btn { background-color: #e2e8f0; color: #4a5568; }
+
+ .eval-btn {
+ flex: 1;
+ padding: 15px 5px;
+ font-size: 1rem;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ color: white;
+ }
+
+ #back-to-front-btn { background-color: #95a5a6; }
+ #back-to-front-btn:hover { background-color: #7f8c8d; }
+ #wrong-btn { background-color: #e74c3c; }
+ #wrong-btn:hover { background-color: #c0392b; }
+ 
+ #correct-btn { background-color: #2ecc71; }
+ #correct-btn:hover { background-color: #27ae60; }
+
+ .empty-state {
+ font-size: 1.5rem;
+ color: #2ecc71;
+ font-weight: bold;
+ text-align: center;
+ line-height: 1.5;
+ }
+ </style>
+</head>
+<body>
+
+ <h1>🎧 瞑想ガイド②</h1>
+
+ <div class="header-stats">
+ <span id="progress-text">1 / 1</span>
+ <span id="score-text">正解数: 0</span>
+ </div>
+ 
+ <div class="mode-indicator" id="mode-indicator">現在のモード：📁 全問</div>
+
+ <div class="top-controls">
+ <button class="top-btn btn-all" onclick="setMode('all')">📁 全問</button>
+ <button class="top-btn btn-unanswered" onclick="jumpToUnanswered()">🆕 未回答へジャンプ</button>
+ <button class="top-btn btn-review" onclick="setMode('review')">📅 今日の復習</button>
+ <button class="top-btn btn-incorrect" onclick="setMode('incorrect')">🎯 未正解</button>
+ </div>
+
+ <div id="flashcard">
+ <div id="front-side">
+ <div class="date-badge" id="date-badge">最終回答日：未回答</div>
+ <div class="srs-badge" id="srs-badge"></div>
+ <div class="english-text" id="front-eng-content"></div>
+ <button id="play-audio-btn">🔊 音声を聴く</button>
+ </div>
+
+ <div id="back-side">
+ <div class="english-text-back" id="back-eng-content"></div>
+ <div class="japanese-text" id="jap-content"></div>
+ <div class="note-box" id="note-content"></div>
+ </div>
+ </div>
+
+ <div class="controls" id="controls-front">
+ <button id="prev-btn" class="action-btn" onclick="prevCard()">◀ 前へ</button>
+ <button id="flip-btn" class="action-btn" onclick="flipCard()">🔄 裏返す</button>
+ <button id="next-btn" class="action-btn" onclick="nextCard()">次へ ▶</button>
+ </div>
+
+ <div class="controls" id="controls-back" style="display: none;">
+ <button id="back-to-front-btn" class="eval-btn" onclick="returnToFront()">🔙 表面に戻る</button>
+ <button id="wrong-btn" class="eval-btn" onclick="markIncorrect()">❌ 覚えてない</button>
+ <button id="correct-btn" class="eval-btn" onclick="markCorrect()">◯ 完璧！</button>
+ </div>
+
+ <script>
+ const cardsData = [
+  {"en": "What's that one thing that you're holding onto in your life?", "jp": "あなたが人生の中でしがみついている（手放せずにいる）たった一つの物事とは何でしょうか？", "note": "hold onto [something] は「〜にしがみつく、固執する、手放さない」。that one thing... that you're holding onto は関係代名詞 that による修飾。"},
+  {"en": "Maybe it's a conversation, an argument you had with another person.", "jp": "もしかするとそれは誰かとの会話、あるいは議論（言い争い）かもしれません。", "note": "an argument you had... は目的格関係代名詞の省略（argument [which] you had）。"},
+  {"en": "Maybe it's a sense of longing for another person", "jp": "もしかすると誰かに対する切ない愛着（思い焦がれる気持ち）や、", "note": "a sense of longing for... は「〜への強い憧れ、切望、思い焦がれる気持ち」。"},
+  {"en": "or a sense of frustration with something that's happening in your life right now.", "jp": "あるいは今まさにあなたの人生で起きていることに対する苛立ち（フラストレーション）かもしれません。", "note": "a sense of frustration with... は「〜に対する挫折感・苛立ち」。something that's happening... は関係代名詞 that の節。"},
+  {"en": "Maybe it's even a physical thing that you've become attached to over time.", "jp": "あるいは時間が経つにつれてあなたが愛着（執着）を持つようになった形ある「物」であることさえあります。", "note": "become attached to [something] は「〜に愛着を持つ、固執する」。over time は「時間の経過とともに」。"},
+  {"en": "It's so easy to hold onto things, and as a result, we feel heavy.", "jp": "物事にとらわれるのはとても簡単なことであり、その結果として、私たちは心を重く感じてしまうのです。", "note": "It is + adj + to verb は仮主語構文。as a result は「その結果として」。"},
+  {"en": "We feel weighed down like we're carrying baggage in our life.", "jp": "まるで人生の重荷（バゲッジ）を背負って歩んでいるかのように、圧迫感や重さを感じています。", "note": "weighed down は「（重荷で）押しつぶされそうな、圧迫された」。carry baggage は「心の重荷・トラウマを抱える」という比喩表現。"},
+  {"en": "Today we're going to explore letting go.", "jp": "今日は「手放すこと（手放しの実践）」について深く探求していきます。", "note": "explore は「探求する、深く考察する」。letting go は動名詞で「手放すこと、執着を離れること」。"},
+  {"en": "I'll also be introducing you to a meditation technique,", "jp": "また、ある瞑想の技法についてもご紹介します。", "note": "I'll be introducing... は未来進行形（「〜をご紹介することになります」というスムーズな案内）。"},
+  {"en": "a visualization that can help you feel a bit lighter in your life.", "jp": "あなたの人生を少しだけ軽やかに感じさせてくれる「ビジュアライゼーション（可視化）」の実践です。", "note": "visualization は「視覚化、イメージ法」。help you feel は help + O + bare infinitive（「あなたが〜と感じるのを助ける」）。"},
+  {"en": "Hi, I'm Andy, and welcome to Headspace Guide to Meditation.", "jp": "こんにちは、アンディです。『ヘッドスペースの瞑想ガイド』へようこそ。", "note": "welcome to [something] は「〜へようこそ」。定番の番組オープニング。"},
+  {"en": "So, once I'd made the decision to actually become a monk, obviously there was a process that I had to go through,", "jp": "私が実際に僧侶（出家）になる決断をした時、当然のことながら経なければならないプロセスがありました。", "note": "make the decision to [verb] は「〜する決断を下す」。go through は「（プロセスや困難を）経る、経験する」。"},
+  {"en": "not just flying out to another country and becoming a monk", "jp": "単に海外へ飛んで僧侶になるということだけでなく、", "note": "not just A but also B（AだけでなくBも）の文脈の前半。fly out は「（飛行機で）飛び立つ」。"},
+  {"en": "but also the process of letting go of my life.", "jp": "それまでの自分の暮らしや人生を手放していくプロセスです。", "note": "letting go of my life は「これまでの生活様式や身分を手放すこと」。"},
+  {"en": "And it wasn't just letting go of all the physical belongings.", "jp": "そしてそれは、形ある所有物（持ち物）をすべて手放すことだけにとどまりませんでした。", "note": "physical belongings は「物質的な所有物・持ち物」。"},
+  {"en": "It was also letting go of the environment that I'd grown up in,", "jp": "私自身が生まれ育った環境を手放すことでもあり、", "note": "the environment [that] I'd grown up in は過去完了形（出家以前に育った場所）。"},
+  {"en": "even letting go of my hair.", "jp": "自分の髪の毛を剃り落とす（手放す）ことさえ含まれていました。", "note": "even letting go of... は「〜を手放すことさえも」。出家における剃髪（ていはつ）を指しています。"},
+  {"en": "But I think the thing that really surprised me,", "jp": "しかし、私が本当に驚かされたことといえば、", "note": "the thing that really surprised me は主語となる関係代名詞節（「私を本当に驚かせたこと」）。"},
+  {"en": "you know, I thought I was going away and I would be giving away my busy mind.", "jp": "遠くへ旅立つことで、自分の中の多忙で騒がしい心（雑念）をも手放せると思い込んでいたことです。", "note": "give away は「（不要なものを）手放す、人にあげる」。busy mind は「絶えず思考が動き回る騒がしい心」。"},
+  {"en": "I thought I was going to be letting go", "jp": "私は手放せるものだと思っていました、", "note": "I thought I was going to... は「〜するつもり・はずだと思っていた（実際は違った）」という過去の推測。"},
+  {"en": "of all the difficult emotions I'd ever experienced.", "jp": "これまでに経験したあらゆる苦しい感情のすべてを。", "note": "difficult emotions は「困難で苦しい感情」。I'd ever experienced は過去完了＋ever（それまでに経験したことのある）。"},
+  {"en": "Well, I very quickly realized that it wasn't quite so easy to let go of the things in my mind.", "jp": "ですが、自分の頭の中にあるものを手放すのは、そう簡単にはいかないのだとすぐに痛感させられました。", "note": "realize that... は「〜だと悟る・気づく」。it was not quite so easy to... は仮主語構文（「〜することはそれほど簡単ではなかった」）。"},
+  {"en": "So even as I sat there in these beautiful surroundings in the Himalaya Mountains", "jp": "ですから、ヒマラヤ山脈の美しい景観の中に座り、", "note": "even as... は「〜しているその時でさえ」。beautiful surroundings は「美しい環境・ロケーション」。"},
+  {"en": "with the very best teachers in the world close by, I still experienced the mind.", "jp": "世界最高峰の指導者（師匠）たちがすぐ近くにいる環境にあっても、私の心は相変わらず働き続けていました。", "note": "with + O + C（付帯状況のwith）「最高の名師たちをすぐ近くに配して」。the very best は強調表現（「まさに最高の」）。"},
+  {"en": "It was sort of ticking away in the background.", "jp": "心（思考）は背景でチクタクと音を立てて動き回っていたのです。", "note": "tick away は「（時計の針が）チクタク刻む、背景で刻々と動き続ける」。in the background は「バックグラウンドで、意識の背景で」。"},
+  {"en": "And for most of us, right, our minds are quite busy most of the time,", "jp": "そして私たちの大半にとって、心は大半の時間、かなり忙しく動き回っていますよね。", "note": "right? は共感を求める「ですよね？」。most of the time は「たいてい、大半の時間」。"},
+  {"en": "almost like a little sort of monkey jumping around, never really stopping,", "jp": "まるで小さなサルのようにあちこち跳び回り、決して立ち止まることがなく、", "note": "monkey jumping around は仏教・瞑想用語の「Monkey Mind（暴れ回るサルのように落ち着きのない心）」を指す有名なたとえ表現。"},
+  {"en": "never taking the time to rest.", "jp": "決して休む時間を取ろうとしません。", "note": "take the time to [verb] は「じっくり時間をかけて〜する」。never taking... は分詞構文の否定形。"},
+  {"en": "And I think because of that, we tend to feel quite tired.", "jp": "そしてそのせいで、私たちは日常的にかなりの疲労感を感じがちなのだと思います。", "note": "because of that は「そのために」。tend to [verb] は「〜する傾向がある、〜しがちである」。"},
+  {"en": "We often feel overwhelmed.", "jp": "私たちは頻繁に（思考や感情に）圧倒されてしまいます。", "note": "overwhelmed は「（感情・情報・ストレスに）圧倒された、一杯一杯になった」。"},
+  {"en": "We don't necessarily know how to experience a sense of rest and relaxation.", "jp": "どうすれば休息やリラックスの感覚を味わえるのか、私たちは必ずしも分かっていません。", "note": "not necessarily は部分否定（「必ずしも〜とは限らない」）。how to experience... は「〜の体験の仕方」。"},
+  {"en": "So what we usually do in that situation is to try and think our way out of the problem.", "jp": "ですから、そうした状況で私たちがやりがちなのは、「思考によって問題を乗り越えよう（考え抜こう）とする」ことです。", "note": "think one's way out of [something] は「思考を使って（困難や問題から）抜け出そうとする、考え抜いて解決しようとする」という高度な表現。"},
+  {"en": "So we're essentially using the monkey to try and control the monkey.", "jp": "つまり私たちは本質的に、「サルをコントロールするために、別のサルを使っている」ようなものなのです。", "note": "essentially は「本質的に、詰まるところ」。using A to try and control A の比喩（思考で思考を制御しようとする矛盾）。"},
+  {"en": "And so we need to find a way of letting go", "jp": "ですから、私たちは「手放す方法」を見つける必要があります。", "note": "find a way of [doing] は「〜する方法・手段を見つける」。"},
+  {"en": "not only by creating", "jp": "単に外側の環境を作り出すことだけでなく、", "note": "not only A but also B の文脈。by creating... は「〜することによって」。"},
+  {"en": "the conditions around us in life", "jp": "私たちの周りにある生活環境を、", "note": "conditions around us は「身の回りの状況・環境」。"},
+  {"en": "that are conducive to relaxation", "jp": "リラックスにふさわしい（適した）状態に整えることだけでなく、", "note": "be conducive to [something] は「〜に寄与する、〜の助けとなる、〜に適している」という知的な重要形容詞表現。"},
+  {"en": "but also internally understanding how we can find relaxation in the mind.", "jp": "内面的に「どのようにすれば心の中に寛ぎ（リラックス）を見出せるか」を理解することによってです。", "note": "internally は「内面的に、心の内側で」。how we can find... は間接疑問文。"},
+  {"en": "What we need to do is", "jp": "私たちがすべきこととは、", "note": "What we need to do is... は擬似強調構文（「私たちがする必要があるのは〜である」）。"},
+  {"en": "to create an environment", "jp": "ある環境を作り出すことです、", "note": "create an environment は「環境・条件を整える」。"},
+  {"en": "where we can naturally let go.", "jp": "自然に手放すことができるような環境を。", "note": "where は関係副詞（「そこで〜できるような環境」）。naturally は「自然に、力まずに」。"},
+  {"en": "The way this was explained to me was by one of my teachers in the monastery.", "jp": "このことが私に説明されたやり方は、修道院（寺院）の私の師の一人によるものでした。", "note": "The way [that] this was explained to me は主語（「これが私に解説された方法」）。monastery は「修道院、寺院、修行場」。"},
+  {"en": "He said, \"Imagine the blue sky.\"", "jp": "彼はこう言いました。「青空を想像してごらん」と。", "note": "Imagine [something] は命令形による可視化の促し。"},
+  {"en": "He said, \"The blue sky is your mind.\"", "jp": "彼は言いました。「その青空こそが、君の心なのだよ」と。", "note": "瞑想哲学における最も有名かつ美しいメタファー（心＝澄み渡る青空）。"},
+  {"en": "Now, this blue sky always exists.", "jp": "さて、この青空はいつでも常にそこに存在しています。", "note": "always exists は「常に存在する、絶えることがない」。"},
+  {"en": "Sure, there are days when the sky is very cloudy,", "jp": "もちろん、空が非常に雲で覆われている（曇っている）日もありますし、", "note": "there are days when... は「〜な日もある」。cloudy は「雲で覆われた」。"},
+  {"en": "and clouds being our thoughts, we may not necessarily see the blue sky.", "jp": "雲とは私たちの『思考』ですから、必ずしも青空が見えないこともあるでしょう。", "note": "clouds being our thoughts は分詞構文（「雲が私たちの思考であるため」）。not necessarily は部分否定。"},
+  {"en": "In fact, we may go through long periods in our life when there are so many clouds in the sky", "jp": "実際、空にあまりにも多くの雲がかかり、人生の中で長い期間、青空が見えないまま過ごすこともあるかもしれません、", "note": "In fact は「実際に、それどころか」。go through long periods は「長い期間を経験する・通り抜ける」。"},
+  {"en": "that we forget what the blue sky even looks like,", "jp": "青空がどんな姿をしていたかさえ忘れてしまうほどに。", "note": "so [many]... that [clause] 構文（「非常に〜なので…になる」）。what the blue sky looks like は間接疑問文（「青空がどのような見かけであるか」）。"},
+  {"en": "but that doesn't mean that the blue sky has gone anywhere.", "jp": "ですが、それは青空がどこかへ消え去ってしまったことを意味するわけではありません。", "note": "that doesn't mean that... は「〜だからといって…という意味ではない」。has gone anywhere は完了形（「どこかへ行ってしまった」）。"},
+  {"en": "And once we start thinking of the mind in that way,", "jp": "そして、一度心をそのような捉え方（視点）で見始めるようになると、", "note": "once [clause] は接続詞「一度〜すると」。think of A in that way は「Aをそのような方法で考える・捉える」。"},
+  {"en": "we're actually simply creating the conditions", "jp": "私たちは実際、単に条件（環境）を整えているだけなのだと分かります、", "note": "create the conditions は「条件・環境を作り出す」。"},
+  {"en": "to allow the clouds of thoughts to disperse", "jp": "思考という雲が自然に散らばり、消え去るのを認めるための条件を、", "note": "allow O to verb は「Oが〜するのを許可する・可能にする」。disperse（ディスバース）は「散らばる、散会する、消散する」という重要動詞。"},
+  {"en": "so that we can experience more of the blue sky.", "jp": "それによって、私たちがより多くの青空（本来のクリアな心）を体験できるようにです。", "note": "so that [subject] can [verb] は目的（「〜できるように」）。"},
+  {"en": "You don't need to go anywhere to find it. It's ever-present.", "jp": "それを見つけるためにどこかへ行く必要はありません。それは常にそこに存在している（常在している）のです。", "note": "ever-present は「常に存在する、いつでもある」という美しく知的な形容詞。"},
+  {"en": "So visualization can sometimes seem a little tricky at first, but our difficulties with it", "jp": "ですから、ビジュアライゼーション（可視化）は最初は少し難しく（コツが必要に）思えるかもしれませんが、", "note": "visualization は「視覚化・イメージ法」。tricky は「扱いづらい、コツがいる、難しい」。at first は「最初は」。"},
+  {"en": "normally have more to do with the way we're approaching it", "jp": "私たちが直面する難しさは通常、技法そのものというよりも「私たちがそれにどうアプローチしているか」に関係しています。", "note": "have to do with [something] は「〜と関係がある」。have more to do with A than B で「BよりもむしろAと関係している」。"},
+  {"en": "rather than the technique itself. And the good news is", "jp": "技法そのものというよりは。そして嬉しい知らせ（朗報）として、", "note": "rather than [something] は「〜というよりはむしろ」。The good news is... は「良い知らせとしては〜である」。"},
+  {"en": "it's actually quite an easy technique to learn.", "jp": "これは実際、身につけるのがとても簡単なテクニックなのです。", "note": "quite an easy technique to learn は「学ぶのにかなり簡単な技法」（quite + a/an + adj + noun の語順）。"},
+  {"en": "Now, in this particular technique,", "jp": "さて、今回のこの特定の技法では、", "note": "in this particular technique は「この特定の技法においては」。"},
+  {"en": "we're going to imagine a warm flow of light coming down through the top of the head and into the body.", "jp": "頭のてっぺん（頭頂部）を通って身体の中へと注ぎ込んでくる「温かい光の流れ」をイメージしていきます。", "note": "a warm flow of light は「温かい光の流れ」。coming down through... は現在分詞による後置修飾。"},
+  {"en": "And as we're doing that, we might think to ourselves,", "jp": "そしてそうしている時、私たちは心の中でこう考えてしまうかもしれません、", "note": "think to oneself は「心の中で思う、つぶやく」。"},
+  {"en": "\"Okay, I've really got to get this right. I've really got to make it clear in my mind.\"", "jp": "「よし、絶対に正しくやらなきゃ。頭の中で完璧に鮮明にイメージしなきゃ」と。", "note": "I've got to = I must（〜しなければならない）。get this right は「これを正しく行う、成功させる」。make it clear は「それを鮮明にする」。"},
+  {"en": "And we start trying to imagine. We essentially overthink the exercise.", "jp": "そして無理にイメージしようとし始めます。要するに、エクササイズについて『考えすぎてしまう』のです。", "note": "start trying to [verb] は「〜しようとし始める」。overthink は「（難しく）考えすぎる」。"},
+  {"en": "We worry, \"Should the light be small? Should it be big? Should it be round? Should it be square?\"", "jp": "「光は小さい方がいいのかな？大きい方がいいのかな？丸い形？それとも四角い形？」と心配し、", "note": "worry, \"Should it be...?\" と直接疑問の形で不安な思考の渦を描写。"},
+  {"en": "Kind of get in our own way.", "jp": "いわば、自分自身で邪魔をしてしまっている（空回りしている）のです。", "note": "get in one's own way は「自分の邪魔をする、自滅する、空回りする」という非常に重要な慣用句。"},
+  {"en": "So with this particular exercise, we're gonna take a slightly different approach.", "jp": "ですので今回のエクササイズでは、少しだけ異なるアプローチを取ることにしましょう。", "note": "take an approach は「アプローチ・対処法を取る」。slightly は「少しだけ、わずかに」。"},
+  {"en": "In fact, take a moment right now to imagine a place that you really enjoy.", "jp": "実際、今この瞬間に少し時間を取って、あなたが本当に大好きな場所をイメージしてみてください。", "note": "take a moment to [verb] は「ちょっと時間を取って〜する」。a place [that] you really enjoy は関係代名詞の省略。"},
+  {"en": "So just picture that place in your mind.", "jp": "ただ、その場所を心の中で思い描いてみてください。", "note": "picture [something] in one's mind は「〜を心の中で描き出す、思い描く」。"},
+  {"en": "Might be the colors, the shapes.", "jp": "そこにある色彩や、形かもしれません。", "note": "主語 It が省略された口語表現（「それらの色や形かもしれません」）。"},
+  {"en": "Maybe it's the sounds, the smells.", "jp": "あるいは聞こえてくる音や、香りかもしれません。", "note": "sounds and smells（五感に訴えかけるイメージ）。"},
+  {"en": "So my guess is that right now that image naturally comes to mind.", "jp": "私の推測では、今まさにそのイメージがごく自然に頭に浮かんでいるはずです。", "note": "My guess is that... は「私の推測・見立てでは〜である」。come to mind は「（考えや情景が）頭に浮かぶ」。"},
+  {"en": "You just see it, right?", "jp": "ただ、自然と目に見えていますよね？", "note": "You just see it は「努力せずにパッと見えている状態」。"},
+  {"en": "And it may even remain in the mind for a few seconds", "jp": "そしてそのイメージは、数秒間にわたって心の中に留まり続けるかもしれません、", "note": "remain in the mind は「心の中に留まる、記憶に残る」。for a few seconds は「数秒間」。"},
+  {"en": "without any real effort to try and keep it there.", "jp": "それをそこに留め置こうとする特別な努力などを何もしなくても。", "note": "without any real effort は「本当の努力・力みを一切使わずに」。"},
+  {"en": "So it's this gentle, relaxed approach that works really well for visualization.", "jp": "つまり、ビジュアライゼーションにおいて驚くほど上手く機能するのは、まさにこのような『穏やかでリラックスしたアプローチ』なのです。", "note": "It is... that... の強調構文（「ビジュアライゼーションに有効なのはまさにこのアプローチなのだ」）。work well は「上手く機能する、効果を発揮する」。"},
+  {"en": "So remember, it doesn't require any great effort.", "jp": "ですから覚えておいてください、大きな努力や力みは一切必要ありません。", "note": "require [something] は「〜を必要とする、要求する」。great effort は「多大な努力・力み」。"},
+  {"en": "So focus less on the clarity of the image", "jp": "ですから、イメージの『鮮明さ（くっきり感）』に意識を向けすぎるのではなく、", "note": "focus less on A and more on B（AよりもむしろBに意識を向ける）。clarity（クラリティ）は「明確さ、鮮明度」。"},
+  {"en": "and more on the feeling that it brings to the meditation,", "jp": "そのイメージが瞑想にもたらしてくれる『感覚・心地よさ』により意識を向けてみてください。", "note": "the feeling that it brings... は関係代名詞の節（「それがもたらす感覚」）。"},
+  {"en": "and in time, that image will naturally become clearer.", "jp": "そうすればやがて（時間を経るうちに）、そのイメージは自然とより鮮明になっていきます。", "note": "in time は「やがて、そのうち」。become + comparative（「より〜になる」）。"},
+  {"en": "As we meditate more frequently, we get more comfortable with it.", "jp": "私たちがより頻繁に瞑想を行うにつれて、それに対してより快適さ（慣れ）を感じるようになります。", "note": "As [clause] は比例・進行（「〜するにつれて」）。get comfortable with [something] は「〜に慣れる、心地よく感じる」。"},
+  {"en": "And then we not only get the benefits during the meditation,", "jp": "すると、単に瞑想の最中に効果（メリット）が得られるだけでなく、", "note": "not only A but also B の構文。during the meditation は「瞑想を行っている間」。"},
+  {"en": "but it also carries on and over into the rest of our life.", "jp": "その効果は持続し、私たちの日常生活のあらゆる場面へと広がっていくのです。", "note": "carry over into [something] は「（ある状態や効果が）〜へと持ち越される、引き継がれる、波及する」という重要句動詞。the rest of our life は「私たちの残りの人生・日常」。"},
+  {"en": "Now, there's actually a scientific reason for this.", "jp": "さて、実はこれには明確な科学的理由が存在します。", "note": "scientific reason for [something] は「〜に対する科学的な理由・根拠」。"},
+  {"en": "There's something changing inside of our brain as we meditate.", "jp": "私たちが瞑想をしている時、脳の内部ではある変化が起きているのです。", "note": "there's something changing... は現在分詞による修飾（「変化している何かが存在する」）。"},
+  {"en": "In an amazing study, Dr. Sara Lazar of Harvard University", "jp": "ハーバード大学のサラ・ラザー博士（Dr. Sara Lazar）による驚くべき研究において、", "note": "amazing study は「目を見張るような研究」。ハーバード医科大学の有名神経科学者の実例紹介。"},
+  {"en": "helped show how after just eight weeks", "jp": "たった8週間の（短い）期間であっても、", "note": "help show... は「〜を示すのに寄与する」。after just eight weeks は「わずか8週間後に」。"},
+  {"en": "of meditation training,", "jp": "瞑想のトレーニングを行った後で、", "note": "meditation training は「瞑想の訓練・実践」。"},
+  {"en": "we can actually bring about physical changes to the areas of the brain", "jp": "脳の特定の領域に対して、実際に物理的な（構造上の）変化を引き起こせることが証明されました。", "note": "bring about [something] は「〜をもたらす、引き起こす」という重要句動詞。physical changes は「物理的・構造的な変化」。"},
+  {"en": "associated with learning and memory.", "jp": "学習や記憶に関連する脳の領域に対してです。", "note": "associated with [something] は過去分詞による後置修飾（「〜に関連した」）。海馬（hippocampus）などを指しています。"},
+  {"en": "So those parts of the brain actually increased in size,", "jp": "つまり、脳のそれらの部分（学習や記憶を司る部位）は実際にサイズが増大し（大きくなり）、", "note": "increase in size は「サイズ・大きさが増す」。"},
+  {"en": "and the part that's associated with anxiety and stress actually grew smaller.", "jp": "一方で、不安やストレスに関連する部位（扁桃体など）は実際に小さくなったのです。", "note": "grow smaller は「（だんだんと）小さくなる」。anxiety and stress は「不安とストレス」。"},
+  {"en": "Now, obviously, if we don't continue to practice,", "jp": "さて、もちろんのことですが、もし私たちが実践を継続しなければ、", "note": "obviously は「言うまでもなく、当然ながら」。continue to practice は「練習・実践を続ける」。"},
+  {"en": "we won't necessarily continue to experience those benefits.", "jp": "それらの恩恵（効果）を必ずしも享受し続けられるわけではありません。", "note": "experience those benefits は「それらの恩恵・メリットを経験する・享受する」。"},
+  {"en": "But it's really interesting to know that there are physical changes", "jp": "しかし、心理的な変化だけでなく、物理的な（構造上の）変化も起きていると知ることは、極めて興味深いことです。", "note": "It is interesting to know that... は仮主語構文。"},
+  {"en": "as well as psychological changes taking place.", "jp": "心理面での変化が生じているのと全く同様に。", "note": "A as well as B は「BだけでなくAも」。take place は「（変化やイベントが）生じる、起こる」。"},
+  {"en": "Okay. Now it's time to put this all together.", "jp": "さて。それでは、これらをすべて一つに組み合わせて実践してみましょう。", "note": "It's time to [verb] は「〜する時間だ」。put A all together は「〜を一つにまとめる、総合的に実践する」。"},
+  {"en": "I'm gonna guide you through a meditation.", "jp": "私があなたを瞑想セッションへと案内していきます。", "note": "guide [someone] through [something] は「〜を通して案内・誘導する」。"},
+  {"en": "So as always, just take a moment to make sure that you are comfortable in your surroundings.", "jp": "ですのでいつものように、まずは少し時間を取って、ご自分の周りの環境でリラックスできているか確かめてください。", "note": "as always は「いつものように」。make sure that [clause] は「確実にする、確かめる」。"},
+  {"en": "Maybe decide whether you'd like to do this meditation lying down, sitting up,", "jp": "横になって行うか、背筋を伸ばして座って行うかを決めると良いでしょう。", "note": "whether A or B は「AかBか」。lying down（横たわって）、sitting up（座って）。"},
+  {"en": "eyes open, eyes closed, whatever feels most natural and most comfortable to you.", "jp": "目を開けたままでも、閉じた状態でも構いません。あなたにとって最も自然で心地よく感じる方法を選んでください。", "note": "whatever feels most natural は「最も自然に感じられるものは何であれ」。付帯状況の描写。"},
+  {"en": "So just as you're getting comfortable, just a reminder that your mind is still gonna think.", "jp": "寛ぎながら覚えておいてほしいのですが、あなたの心は相変わらず思考を巡らせるものです。", "note": "just a reminder that... は「〜ということを念のため思い出してください・留意してください」。"},
+  {"en": "Don't be frustrated if thoughts arise. The mind will naturally wander.", "jp": "思考が湧き上がってきたとしても、焦ったりイライラしたりしないでください。心は自然と迷い、彷徨う（さまよう）ものなのです。", "note": "arise（アライズ）は「（問題や思考が）生じる、湧き出る」。wander（ワンダー）は「（意識が）さまよう、逸れる」。"},
+  {"en": "Our only job is to notice when it wanders", "jp": "私たちの唯一の仕事は、意識が逸れた（彷徨った）時にそれに気づくことであり、", "note": "Our only job is to [verb] は「私たちの唯一の役割は〜することだ」。notice when... は「〜した時に気づく」。"},
+  {"en": "and then to gently come back to our object of focus,", "jp": "そして優しく、私たちが意識を向けている対象へと戻ってくることです。", "note": "come back to [something] は「〜へと戻る」。object of focus は「集中・意識の対象」。"},
+  {"en": "which today is gonna be", "jp": "そしてその対象とは、本日は、", "note": "which は非制限用法の関係代名詞（「そしてそれは〜になる」）。"},
+  {"en": "this image in our mind.", "jp": "私たちの心の中にある『イメージ（光の画像）』となります。", "note": "image in our mind は「心の中の可視化イメージ」。"},
+  {"en": "The more effort we apply, the less relaxing the exercise feels.", "jp": "私たちが力を入れれば入れるほど（力むほど）、このエクササイズはリラックス感から遠ざかってしまいます。", "note": "The + comparative..., the + comparative... 構文（「〜すればするほど、ますます…になる」）。apply effort は「力を加える、力む」。"},
+  {"en": "So use this as an opportunity to really step back", "jp": "ですので、これを一歩後ろに引いて（一呼吸置いて）みるための絶好の機会として利用してください。", "note": "use A as an opportunity to verb は「Aを〜するための機会として活かす」。step back は「一歩引く、客観的になる」。"},
+  {"en": "and find a sense of ease in your body and in your mind.", "jp": "そしてご自分の身体と心の中に、寛ぎと安心感（ease）を見出していきましょう。", "note": "a sense of ease は「安心感、寛ぎ、気楽さ」。"},
+  {"en": "What we're looking for is already here, that idea of the blue sky.", "jp": "私たちが探し求めているもの（青空という概念）は、すでにここに存在しています。", "note": "What we're looking for is... は関係代名詞 what の節（「私たちが探しているもの」）。already here は「すでにここにある」。"},
+  {"en": "We don't have to try and change something in the mind.", "jp": "心の中の何かを無理に変えようとする必要はありません。", "note": "don't have to [verb] は「〜する必要はない」。try and change は try to change（〜しようと試みる）。"},
+  {"en": "It's simply creating the conditions for the clouds to part.", "jp": "ただ単に、雲が自然に晴れていく（離れていく）ための条件を整えてあげれば良いのです。", "note": "part（パート）は動詞で「（雲や人混みが）分かれる、離れる、晴れる」。for the clouds は to part の意味上の主語。"},
+  {"en": "We're gonna begin with the eyes open and nice soft focus,", "jp": "まずは目を開けた状態で、柔らかくソフトな視線（フォーカス）から始めていきましょう。", "note": "soft focus は「（一点を凝視しない）柔らかく開かれた視線」。"},
+  {"en": "just aware of the space around you.", "jp": "ただ自分の周りにある空間に意識を向けながら。", "note": "be aware of [something] は「〜に気づいている、〜を認識している」。"},
+  {"en": "So not staring at one thing but just seeing everything very softly.", "jp": "一つの場所をじっと見つめるのではなく、すべてのものをただとても柔らかく視野に収めていきます。", "note": "stare at [something] は「〜を凝視する、じろじろ見る」。not A but B（AではなくB）。"},
+  {"en": "And just maintaining that focus, taking a couple of big, deep breaths.", "jp": "その視線を保ったまま、大きく深呼吸を数回行っていきます。", "note": "maintain focus は「意識・視線を保つ」。take a couple of deep breaths は「深呼吸を2〜3回する」。"},
+  {"en": "Breathing in through the nose…", "jp": "鼻から息を吸い込み……", "note": "breathe in through the nose は「鼻から息を吸う」。"},
+  {"en": "and out through the mouth.", "jp": "そして口から吐き出していきます。", "note": "breathe out through the mouth は「口から息を吐き出す」。"},
+  {"en": "As you breathe in, noticing how the lungs expand, the body filling with air.", "jp": "息を吸い込む時に、肺がどのように膨らみ、身体が空気で満たされていくかに意識を向けます。", "note": "lungs expand は「肺が膨らむ」。filling with air は分詞構文（「空気で満たされながら」）。"},
+  {"en": "As you breathe out,", "jp": "息を吐き出す時には、", "note": "as you breathe out は「息を吐き出しながら」。"},
+  {"en": "a sense of ease as the muscles in the body soften.", "jp": "身体の中の筋肉が柔らかく緩んでいくにつれて、安らぎの感覚が広がります。", "note": "muscles soften は「筋肉が柔らかくなる、和らぐ」。"},
+  {"en": "And just one more time, breathing in through the nose…", "jp": "そしてもう一度だけ、鼻から深く息を吸い込み……", "note": "one more time は「もう一回だけ」。"},
+  {"en": "and out through the mouth.", "jp": "口からゆっくりと吐き出します。", "note": "ガイドに従ったゆったりとした息吐き。"},
+  {"en": "And if you'd like to, you can just gently close your eyes now.", "jp": "もしよろしければ、ここでそっと静かに目を閉じていきましょう。", "note": "if you'd like to は「もしそうしたければ」。gently close your eyes は「優しく目を閉じる」。"},
+  {"en": "And take a moment…", "jp": "そして少し時間を取って……", "note": "静寂とポーズを設ける指示。"},
+  {"en": "just to enjoy that feeling of having stopped, having paused.", "jp": "「立ち止まった」「活動を中断した」というその感覚を、ただ味わってみてください。", "note": "having stopped, having paused は完了動名詞（「静止・中断したこと」という完了状態の強調）。"},
+  {"en": "Nothing to do, nowhere to go.", "jp": "するべきこともなく、行くべき場所もありません。", "note": "瞑想の至福を表す古典的表現（「何もしなくてよい解放感」）。"},
+  {"en": "And just feeling that sensation", "jp": "そして、その身体の感覚を感じ取っていきます、", "note": "sensation は「身体的な感覚、皮膚感覚」。"},
+  {"en": "of the body pressing down, the weight of the body pressing down…", "jp": "身体が下へと押し付けられている感覚、身体の重みが下へと沈み込んでいる感触を……", "note": "pressing down は「下に押される、重力で沈み込む」。weight of the body は「体重、身体の重み」。"},
+  {"en": "against the seat beneath you, the floor beneath you.", "jp": "あなたの下にある椅子や、下にある床に対して。", "note": "beneath you は「あなたの足元・下にある」。重力を感じるグラウンディング（Grounding）の指示。"},
+  {"en": "As always, just checking in with the body, with the space around you,", "jp": "いつものように、ご自身の身体の状態や周りの空間にそっと意識を向けて（確認して）みます。", "note": "check in with [something] は「〜の様子を確認する、意識を向ける」。"},
+  {"en": "maybe noticing any sounds around you,", "jp": "おそらく自分の周囲から聞こえてくる音に気づいたり、", "note": "notice any sounds は「音の存在に気づく」。"},
+  {"en": "noticing any resistance to those sounds.", "jp": "そうした音に対する（自分の中の）反発や抵抗感に気づくかもしれません。", "note": "resistance to [something] は「〜に対する抵抗・嫌悪感」。「うるさいな」と判断する思考の観察。"},
+  {"en": "Just allowing everything just to come and go.", "jp": "すべての音や感覚が、ただ現れては去っていくのを（コントロールせずに）許容してあげましょう。", "note": "allow A to come and go は「Aが自由に去来するのを許す」。マインドフルネスの根幹である非判断（Non-judgment）。"},
+  {"en": "And as you sit there or as you lie there,", "jp": "そしてそこに座りながら、あるいは横たわりながら、", "note": "sit there / lie there（座っている・横になっている状態）。"},
+  {"en": "just noticing how the body feels today.", "jp": "今日、自分の身体がどのように感じられているか（調子や感覚）をただ観察します。", "note": "notice how + subject + feels は「〜がどのように感じられるか観察する」。"},
+  {"en": "Perhaps even any areas where you feel that maybe you're holding on to a little bit of tension…", "jp": "もしかすると、ほんの少し力み（緊張）を抱え込んでしまっている部位があることに気づくかもしれません……", "note": "holding on to tension は「緊張・力みを溜め込む、抱える」。areas where... は場所を表す関係副詞。"},
+  {"en": "areas that would benefit from letting go.", "jp": "手放すこと（力を抜くこと）によって楽になるような、そんな部位です。", "note": "benefit from [doing] は「〜することによって恩恵を受ける・楽になる」。"},
+  {"en": "And just for a few moments, just noticing how the body's breathing,", "jp": "そしてほんの短い時間、身体がどのように息をしているのかにただ意識を向けてみます。", "note": "for a few moments は「ほんのひととき、しばしの間」。"},
+  {"en": "that rising and falling sensation.", "jp": "あの（胸や腹部が）上下に膨らみ、沈み込む感覚です。", "note": "rising and falling sensation は呼吸に伴う「（お腹や胸の）波のような上下運動の感覚」。"},
+  {"en": "Don't need to do anything with it.", "jp": "それに対して何かをコントロールしたり、操作したりする必要はありません。", "note": "Don't need to... 主語 You の省略。ありのままの呼吸を観察する指示。"},
+  {"en": "Taking a moment to rest the attention there.", "jp": "そこにそっと意識（注意）を留めて、憩わせてあげましょう。", "note": "rest one's attention on/there は「〜に注意・意識を休ませる、優しく置く」。"},
+  {"en": "Imagine that above your head", "jp": "あなたの頭上に、次のようなものが存在するとイメージしてみてください。", "note": "Imagine that [clause]（〜だとイメージする）。可視化ガイドの開始。"},
+  {"en": "is a steady flow of warm sunlight", "jp": "絶え間なく注ぐ「温かい太陽の光の流れ」があり、", "note": "steady flow は「絶え間ない流れ、安定した流出」。warm sunlight は「温かな日光」。倒置構文（Above your head is...）。"},
+  {"en": "flowing down into the body,", "jp": "それが身体の中へとスーッと流れ込み、", "note": "flowing down into... は現在分詞による描写（「〜の中へと流れ下りていく」）。"},
+  {"en": "all the way down towards the feet and the toes.", "jp": "足元や足の指先に向かって、ずっと下まで届いていく様子を。", "note": "all the way down は「一番下までずっと、はるばる下まで」。towards は「〜に向かって」。"},
+  {"en": "We're going to imagine that this sunlight fills the body.", "jp": "この太陽の光が、身体全体を満たしていくとイメージしていきます。", "note": "fill the body は「身体を満たす、充満する」。"},
+  {"en": "And as it fills the body, it's just gonna melt away", "jp": "そして身体が光で満たされるにつれて、それは溶かして消し去ってくれます、", "note": "melt away は「（氷が溶けるように）じんわりと溶けて消え去る」。"},
+  {"en": "any discomfort, any tension.", "jp": "あらゆる不快感や、あらゆる力み（緊張）を。", "note": "discomfort は「不快感、違和感」。tension は「張り、緊張、力み」。"},
+  {"en": "Just softening the body,", "jp": "ただただ身体を柔らかく解きほぐし、", "note": "softening は分詞構文（「身体を柔軟に緩めながら」）。"},
+  {"en": "softening the mind. So we're going to start down at the toes.", "jp": "心をも柔らかく緩めていきます。それでは、まずは足の指先から始めていきましょう。", "note": "start down at [something] は「〜の一番下から始める」。ボディスキャン的なアプローチ。"},
+  {"en": "So again, imagining that steady sunlight flowing down through the body…", "jp": "ですからもう一度、あの絶え間ない太陽の光が身体を通って流れ下りていくのを思い描き……", "note": "flowing down through the body は「身体を通り抜けて下りていく」。"},
+  {"en": "filling the toes…", "jp": "足の指先を満たし……", "note": "toes は「足の指」。"},
+  {"en": "the feet…", "jp": "足裏や足全体を満たし……", "note": "feet は「足（足首から下）」。"},
+  {"en": "up past the ankles and into the lower half of the legs.", "jp": "足首を通り過ぎて上へと昇り、膝から下の足（ふくらはぎやすね）を満たしていきます。", "note": "past the ankles は「足首を通り過ぎて」。lower half of the legs は「脚の下半分（膝下）」。"},
+  {"en": "So once you set it in motion, it's as though it's just happening.", "jp": "一度そのイメージを動かし始めれば、あとはまるで自動的にそれが起きているかのように感じられます。", "note": "set [something] in motion は「〜を始動させる、動き出させる」という重要イディオム。it's as though... は「まるで〜であるかのようだ」。"},
+  {"en": "Sometimes we're aware of it. Sometimes the mind wanders off.", "jp": "時には光を意識できていますし、時には心がどこかへ彷徨い出してしまうこともあります。", "note": "wander off は「（意識や視線が）どこかへ逸れる、脱線する」。"},
+  {"en": "Whenever the mind wanders, we just gently bring it back again…", "jp": "心が逸れてしまうたびに、ただ優しく再び戻してあげれば良いのです……", "note": "Whenever [clause] は「〜する時はいつでも」。bring it back は「それを元に戻す」。"},
+  {"en": "to that image in the mind. So again, as that sunlight moves through the body, just melting any tension…", "jp": "心の中にあるあのイメージへと。ですから再び、太陽の光が身体を通って移動し、力みを溶かしていくにつれて……", "note": "move through the body は「身体の中を移動する」。"},
+  {"en": "moving into the upper half of the legs…", "jp": "太もも（脚の上半分）へと移動していき……", "note": "upper half of the legs は「大腿部・太もも」。"},
+  {"en": "and the muscles just softening.", "jp": "そして筋肉がただ柔らかく解きほぐされていきます。", "note": "muscles softening は名詞＋分詞（筋肉が緩んでいく描写）。"},
+  {"en": "As it continues up towards the pelvis,", "jp": "光がさらに上に向かって、骨盤のあたりへと進むにつれて、", "note": "pelvis（ペルヴィス）は解剖学・身体用語で「骨盤」。"},
+  {"en": "the waist.", "jp": "腰回りへと進み。", "note": "waist は「ウエスト、腰回り」。"},
+  {"en": "In any muscles, any tension, just softening,", "jp": "あらゆる筋肉、あらゆる張りや緊張が、ただ和らぎ、", "note": "softening は「柔らかくなる、ほぐれる」。"},
+  {"en": "dissolving in that sunlight.", "jp": "その太陽の光の中で溶けて消え去っていきます。", "note": "dissolve（ディゾルブ）は「（液体に）溶ける、溶解する、解消する」。"},
+  {"en": "As it continues up through the stomach and the lower back…", "jp": "光がさらにみぞおち・お腹や、腰の低い位置（背中下部）を通って上がり……", "note": "stomach は「お腹・胃」。lower back は「腰・背中下部（ローバック）」。"},
+  {"en": "and any tension just melting away.", "jp": "あらゆる力みが、ただじんわりと溶け去っていきます。", "note": "melting away は「溶けて消える」。"},
+  {"en": "It continues…", "jp": "光はそのまま進み続け……", "note": "光の流動の継続。"},
+  {"en": "up towards the chest and the upper back.", "jp": "胸のあたりや、背中の上の部分（肩甲骨付近）へと向かっていきます。", "note": "chest は「胸」。upper back は「背中上部・肩甲骨周辺」。"},
+  {"en": "Any tension just dissolving in the sunlight.", "jp": "あらゆる緊張が、太陽の光の中でただ溶けていきます。", "note": "反復によるリラクゼーションの誘導。"},
+  {"en": "Just still that center sunlight coming down from above the head into the body,", "jp": "頭上から身体の中へと注ぎ込んでいる、中心にあるあの太陽の光をただ感じながら、", "note": "center sunlight は「身体の中心を貫く光軸」。"},
+  {"en": "flowing down, now past the shoulders, down the arms…", "jp": "光は下へと流れ、今度は肩を通り過ぎ、腕を下っていき……", "note": "past the shoulders は「肩を通り抜けて」。down the arms は「腕を下って」。"},
+  {"en": "and towards the hands and the fingers and thumbs.", "jp": "手や、指先、親指へと向かっていきます。", "note": "fingers and thumbs は「手指全般（四本指と親指）」。"},
+  {"en": "As it travels down the arms, again, just melting any tension.", "jp": "光が腕を下っていくにつれて、もう一度、あらゆる力みがただ溶け去っていきます。", "note": "travel down は「〜を下って移動する、伝わる」。"},
+  {"en": "The body just letting go.", "jp": "身体がただ、握りしめていた緊張を手放していきます。", "note": "The body just letting go（身体自体が自発的に緩んで手放していく状態）。"},
+  {"en": "As it continues to flow down, now filling", "jp": "光がそのまま下へと流れ続け、今度は満たしていきます、", "note": "continue to flow down は「下へと流れ続ける」。"},
+  {"en": "the area of the neck and the throat, just everything softening into the jaw…", "jp": "首や喉のエリアを。あらゆる部位が柔らかくなり、あごのラインへと馴染んでいきます……", "note": "neck and throat は「首と喉」。jaw（ジョー）は「あご・顎関節」。"},
+  {"en": "and lower jaw, upper jaw, behind the nose, behind the eyes.", "jp": "下あご、上あご、鼻の奥、そして目の奥へと。", "note": "behind the nose / eyes は「鼻や目の奥側の緊張部位（顔面の力み）」。"},
+  {"en": "Any tension…", "jp": "あらゆる張りや緊張が……", "note": "微細な緊張の解放。"},
+  {"en": "just drifting away…", "jp": "ただ漂うように遠ざかり、消え去っていきます……", "note": "drift away は「風や波に流されるように遠ざかる、消え去る」。"},
+  {"en": "until that sunlight reaches the very top of the head.", "jp": "その太陽の光が、頭のてっぺん（頭頂部）にまで到達するまで。", "note": "reaches the very top of the head は「頭のまさに一番てっぺんに達する」。"},
+  {"en": "So even though the entire body", "jp": "ですので、たとえ身体全体が、", "note": "even though [clause] は「〜であるにもかかわらず」。entire body は「全身、身体全体」。"},
+  {"en": "is now filled with that sunlight,", "jp": "今やその太陽の光で完全に満たされていたとしても、", "note": "be filled with [something] は「〜で満たされている」。"},
+  {"en": "that sense of ease, that sense of warmth, that sense of space,", "jp": "あの安らぎの感覚、温もりの感覚、そして広がりの感覚で満たされていたとしても、", "note": "sense of ease, warmth, space（安心感・温かさ・内面の広いスペース）。"},
+  {"en": "we still imagine that it continues.", "jp": "私たちはなおも、その光の流れが続き注いでいるのだとイメージします。", "note": "imagine that it continues は「光が循環し続けているイメージ」。"},
+  {"en": "And you can let go of the focus on that image", "jp": "そして、そのイメージに対する意識の集中を手放して構いません、", "note": "let go of the focus は「集中の固定を手放す・解く」。"},
+  {"en": "but allow the feeling to remain…", "jp": "ただし、その心地よい感覚（感触）だけは残るようにしておきましょう……", "note": "allow + O + to verb は「Oが〜するのを許す」。remain は「残留する、残る」。"},
+  {"en": "as you bring your attention back…", "jp": "意識をゆっくりと手元へと戻しながら……", "note": "bring one's attention back は「意識・注意を連れ戻す」。"},
+  {"en": "to the body, back to that feeling of contact,", "jp": "身体の感触へ、接触している部分（お尻や足裏）の感触へと意識を戻し、", "note": "feeling of contact は「（床や椅子と）触れ合っている接触感」。"},
+  {"en": "back to the sounds and the space around you.", "jp": "周囲から聞こえる音や、自分の周りにある空間へと意識を戻していきます。", "note": "瞑想状態から日常の感覚へと戻るフェードアウト（Grounding）。"},
+  {"en": "You can gently open your eyes whenever you feel ready…", "jp": "準備が整ったと感じた時に、いつでも優しく目を開けていきましょう……", "note": "whenever you feel ready は「準備ができたと感じたら満足いくタイミングでいつでも」。"},
+  {"en": "but as always, taking a moment to notice how the body feels,", "jp": "ですがいつものように、少し時間を取って身体がどのように感じられるか観察してみてください、", "note": "take a moment to notice は「時間を取って観察する・気づく」。"},
+  {"en": "to notice how the mind feels,", "jp": "心がどのように感じられるかを確かめてみてください、", "note": "how the mind feels（心の静けさの確認）。"},
+  {"en": "having taken a few minutes out for yourself.", "jp": "自分自身のために、数分間の時間を割くことができた後の感覚を。", "note": "take time out for oneself は「自分のために時間を割く、一休みする」。having taken は完了分詞構文（「時間を割いた後で」）。"},
+  {"en": "So hopefully, you were able to feel a greater sense of lightness today,", "jp": "ですので願わくば、今日はより大きな『軽やかさの感覚』を感じることができたなら幸いです、", "note": "hopefully は「願わくば、上手くいけば」。a greater sense of lightness は「より一層の軽やかさ・解き放たれた感覚」。"},
+  {"en": "a greater sense of letting go.", "jp": "より一層『手放す（解放される）感覚』を。", "note": "a sense of letting go は「とらわれから離れる解放感」。"},
+  {"en": "But if that didn't immediately happen, don't worry. It can take", "jp": "ですが、もしそれがすぐに実感できなかったとしても、心配はいりません。時間を要することもあります、", "note": "immediately は「直ちに、すぐに」。It can take a little while は「少し時間がかかることもある」。"},
+  {"en": "a little while to get comfortable, to get familiar with these exercises.", "jp": "これらのエクササイズに慣れ、しっくり来るようになるまでには少し時間がかかるものです。", "note": "get familiar with [something] は「〜に熟知する、親しむ、慣れる」。"},
+  {"en": "And even if you didn't feel anything just yet,", "jp": "そして、たとえ今すぐには何も変化を感じられなかったとしても、", "note": "even if [clause] は「たとえ〜だとしても」。just yet は「今のところはまだ」。"},
+  {"en": "know that there are very real changes in the brain", "jp": "脳や心の中で、非常に確固たる本当の変化が……", "note": "know that... は命令形（「〜ということを知っておいてください、確信してください」）。very real changes は「極めて実在的・物理的な変化」。"},
+  {"en": "and in the mind that are already starting to happen.", "jp": "すでに生じ始めているのだということを知っておいてください。", "note": "that are already starting to happen は関係代名詞節（「すでに起き始めている変化」）。"},
+  {"en": "As always, meditation only gets better with practice,", "jp": "いつものように、瞑想は練習（実践）を積むことでしか上達しません（どんどん良くなっていきます）。", "note": "get better with practice は「練習すればするほど上手くなる・効果が増す」。"},
+  {"en": "so please join me for episode three, where we're going to explore gratitude,", "jp": "ですので、ぜひエピソード3もご一緒しましょう。そこでは『感謝の心（Gratitude）』について探求していきます、", "note": "gratitude（グラティチュード）は「感謝の気持ち・報恩の心」。where は関係副詞。"},
+  {"en": "how we can have a greater sense of appreciation in our life,", "jp": "私たちの人生において、どのようにすればより大きな『鑑賞・感謝の心』を持てるのか、", "note": "appreciation（アプリシエーション）は「感謝、味わい愛でること、価値を認めること」。"},
+  {"en": "and how we can fall back in love with life again.", "jp": "そしてどのようにすれば、再びこの人生と『恋に落ちる（人生を愛おしく思える）』ことができるのかを。", "note": "fall back in love with [something] は「〜と再び恋に落ちる、〜を再び深く愛せるようになる」。"},
+  {"en": "I'll see you then.", "jp": "それでは、またその時にお会いしましょう。", "note": "I'll see you then は「その時にまた会いましょう」という定番のお別れの挨拶。"}
+ ];
+
+ const savedEvaluated = localStorage.getItem('meditation_2_evaluated');
+ const savedDates = localStorage.getItem('meditation_2_dates');
+ const savedSrs = localStorage.getItem('meditation_2_srs');
+
+ let evaluatedCards = savedEvaluated ? JSON.parse(savedEvaluated) : new Array(cardsData.length).fill(false);
+ let answerDates = savedDates ? JSON.parse(savedDates) : new Array(cardsData.length).fill(null);
+ 
+ let srsData = savedSrs ? JSON.parse(savedSrs) : new Array(cardsData.length).fill(null).map(() => ({
+ interval: 0,
+ ease: 2.5,
+ repetitions: 0,
+ nextReview: null
+ }));
+
+ let currentCardIndex = 0;
+ let correctCount = evaluatedCards.filter(Boolean).length;
+ let isFront = true;
+ let currentMode = 'all'; 
+
+ const frontSide = document.getElementById('front-side');
+ const backSide = document.getElementById('back-side');
+ const frontEngContent = document.getElementById('front-eng-content');
+ const backEngContent = document.getElementById('back-eng-content');
+ const japContent = document.getElementById('jap-content');
+ const noteContent = document.getElementById('note-content');
+ 
+ const controlsFront = document.getElementById('controls-front');
+ const controlsBack = document.getElementById('controls-back');
+ const progressText = document.getElementById('progress-text');
+ const scoreText = document.getElementById('score-text');
+ const playBtn = document.getElementById('play-audio-btn');
+ const dateBadge = document.getElementById('date-badge');
+ const srsBadge = document.getElementById('srs-badge');
+ const modeIndicator = document.getElementById('mode-indicator');
+
+ function saveProgress() {
+ localStorage.setItem('meditation_2_evaluated', JSON.stringify(evaluatedCards));
+ localStorage.setItem('meditation_2_dates', JSON.stringify(answerDates));
+ localStorage.setItem('meditation_2_srs', JSON.stringify(srsData));
+ }
+
+ function getTodayStringFormatted() {
+ const d = new Date();
+ const y = d.getFullYear();
+ const m = String(d.getMonth() + 1).padStart(2, '0');
+ const day = String(d.getDate()).padStart(2, '0');
+ return `${y}-${m}-${day}`;
+ }
+
+ function addDaysToDate(days) {
+ const d = new Date();
+ d.setDate(d.getDate() + days);
+ const y = d.getFullYear();
+ const m = String(d.getMonth() + 1).padStart(2, '0');
+ const day = String(d.getDate()).padStart(2, '0');
+ return `${y}-${m}-${day}`;
+ }
+
+ function getVisibleIndices() {
+ let indices = [];
+ const today = getTodayStringFormatted();
+ 
+ for (let i = 0; i < cardsData.length; i++) {
+ if (currentMode === 'all') {
+ indices.push(i);
+ } else if (currentMode === 'incorrect') {
+ if (answerDates[i] && !evaluatedCards[i]) indices.push(i);
+ } else if (currentMode === 'review') {
+ if (srsData[i].nextReview && srsData[i].nextReview <= today) {
+ indices.push(i);
+ }
+ }
+ }
+ return indices;
+ }
+
+ function updateUI() {
+ let indices = getVisibleIndices();
+ 
+ if (indices.length === 0) {
+ frontSide.style.display = 'flex';
+ backSide.style.display = 'none';
+ controlsFront.style.display = 'none';
+ controlsBack.style.display = 'none';
+ frontEngContent.innerHTML = "<div class='empty-state'>🎉 このモードの対象カードはありません！<br>上のボタンから別のモードに切り替えてね。</div>";
+ dateBadge.style.display = 'none';
+ srsBadge.style.display = 'none';
+ playBtn.style.display = 'none';
+ progressText.textContent = `- / ${cardsData.length}`;
+ scoreText.textContent = `正解数: ${correctCount}`;
+ return;
+ }
+
+ dateBadge.style.display = 'inline-block';
+ srsBadge.style.display = 'block';
+ playBtn.style.display = 'flex';
+
+ if (!indices.includes(currentCardIndex)) {
+ currentCardIndex = indices[0];
+ }
+
+ let pos = indices.indexOf(currentCardIndex);
+ progressText.textContent = `${pos + 1} / ${indices.length} (全${cardsData.length}問)`;
+ scoreText.textContent = `正解数: ${correctCount}`;
+
+ let dateStr = answerDates[currentCardIndex];
+ dateBadge.textContent = dateStr ? `最終回答日：${dateStr}` : `最終回答日：未回答`;
+
+ let srs = srsData[currentCardIndex];
+ if (srs.nextReview) {
+ srsBadge.textContent = `次回予定日: ${srs.nextReview} (連続正解: ${srs.repetitions}回)`;
+ } else {
+ srsBadge.textContent = `まだSRSに登録されていません`;
+ }
+
+ if (isFront) {
+ frontSide.style.display = 'flex';
+ backSide.style.display = 'none';
+ controlsFront.style.display = 'flex';
+ controlsBack.style.display = 'none';
+ } else {
+ frontSide.style.display = 'none';
+ backSide.style.display = 'flex';
+ controlsFront.style.display = 'none';
+ controlsBack.style.display = 'flex';
+ }
+
+ frontEngContent.textContent = cardsData[currentCardIndex].en;
+ backEngContent.textContent = cardsData[currentCardIndex].en;
+ japContent.textContent = cardsData[currentCardIndex].jp;
+ 
+ if (cardsData[currentCardIndex].note) {
+ noteContent.style.display = 'block';
+ noteContent.textContent = "💡 " + cardsData[currentCardIndex].note;
+ } else {
+ noteContent.style.display = 'none';
+ }
+ }
+
+ function flipCard() {
+ isFront = !isFront;
+ updateUI();
+ }
+
+ function returnToFront() {
+ isFront = true;
+ updateUI();
+ }
+
+ function advanceCard(forward) {
+ let indices = getVisibleIndices();
+ if (indices.length === 0) {
+ updateUI();
+ return;
+ }
+
+ let pos = indices.indexOf(currentCardIndex);
+ 
+ if (pos !== -1) {
+ if (forward) {
+ currentCardIndex = indices[(pos + 1) % indices.length];
+ } else {
+ currentCardIndex = indices[(pos - 1 + indices.length) % indices.length];
+ }
+ } else {
+ let nextIdx = indices.find(i => i > currentCardIndex);
+ currentCardIndex = nextIdx !== undefined ? nextIdx : indices[0];
+ }
+ 
+ isFront = true;
+ updateUI();
+ }
+
+ function nextCard() { advanceCard(true); }
+ function prevCard() { advanceCard(false); }
+
+ function markCorrect() {
+ let wasCorrect = evaluatedCards[currentCardIndex];
+ if (!wasCorrect) {
+ correctCount++;
+ evaluatedCards[currentCardIndex] = true;
+ }
+ answerDates[currentCardIndex] = getTodayStringFormatted();
+
+ let cardSrs = srsData[currentCardIndex];
+ cardSrs.repetitions += 1;
+ 
+ if (cardSrs.repetitions === 1) {
+ cardSrs.interval = 1; 
+ } else if (cardSrs.repetitions === 2) {
+ cardSrs.interval = 6; 
+ } else {
+ cardSrs.interval = Math.round(cardSrs.interval * cardSrs.ease);
+ }
+ cardSrs.nextReview = addDaysToDate(cardSrs.interval);
+
+ saveProgress();
+ nextCard();
+ }
+
+ function markIncorrect() {
+ let wasCorrect = evaluatedCards[currentCardIndex];
+ if (wasCorrect) {
+ correctCount--;
+ evaluatedCards[currentCardIndex] = false;
+ }
+ answerDates[currentCardIndex] = getTodayStringFormatted();
+
+ let cardSrs = srsData[currentCardIndex];
+ cardSrs.repetitions = 0; 
+ cardSrs.interval = 1; 
+ cardSrs.ease = Math.max(1.3, cardSrs.ease - 0.2); 
+ cardSrs.nextReview = addDaysToDate(cardSrs.interval);
+
+ saveProgress();
+ nextCard();
+ }
+
+ function setMode(mode) {
+ currentMode = mode;
+ 
+ const modeNames = {
+ 'all': '📁 全問',
+ 'review': '📅 今日の復習',
+ 'incorrect': '🎯 未正解'
+ };
+ modeIndicator.textContent = `現在のモード：${modeNames[mode]}`;
+
+ let indices = getVisibleIndices();
+ if (indices.length > 0) {
+ currentCardIndex = indices[0];
+ }
+ isFront = true;
+ updateUI();
+ }
+
+ function jumpToUnanswered() {
+ let indices = getVisibleIndices();
+ if (indices.length === 0) return;
+
+ let targetIndex = indices.find(index => !answerDates[index]);
+
+ if (targetIndex !== undefined) {
+ currentCardIndex = targetIndex;
+ } else {
+ currentCardIndex = indices[0];
+ }
+ 
+ isFront = true;
+ updateUI();
+ }
+
+ function speakText() {
+ const textToSpeak = cardsData[currentCardIndex].en;
+ window.speechSynthesis.cancel();
+ const utterance = new SpeechSynthesisUtterance(textToSpeak);
+ utterance.lang = 'en-US';
+ utterance.rate = 0.9;
+ window.speechSynthesis.speak(utterance);
+ }
+
+ playBtn.addEventListener('click', speakText);
+
+ updateUI();
+ </script>
+</body>
+</html>
